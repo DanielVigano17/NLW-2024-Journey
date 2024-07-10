@@ -37,25 +37,16 @@ namespace Journey.Application.UseCases.Trips.Register
 
         private void Validate(RequestRegisterTripJson req) {
 
-            if (string.IsNullOrWhiteSpace(req.Name)) {
+            var validator = new RegisterTripValidator();
 
-                throw new JourneyException(ResourceErrorMessages.NAME_EMPTY);
-            
+            var result =  validator.Validate(req);
+
+            if (!result.IsValid) {
+
+                var errorMessages = result.Errors.Select(error => error.ErrorMessage).ToList();
+
+                throw new ErrorOnValidationException(errorMessages);
             }
-
-            if (req.StartDate.Date < DateTime.UtcNow.Date) {
-
-                throw new JourneyException(ResourceErrorMessages.DATE_TRIP_MUST_BE_LATER_THAN_TODAY);
-
-            }
-
-            if (req.EndDate.Date < req.StartDate.Date)
-            {
-
-                throw new JourneyException(ResourceErrorMessages.END_DATE_TRIP_MUST_BE_LATER_START_DATE);
-
-            }
-
         }
     }
 }
